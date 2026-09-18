@@ -9,6 +9,6 @@ let package = Package(
     products: [.library(name: "NotifyKit", targets: ["NotifyKit"])],
     targets: [
         .target(name: "NotifyKit", path: "Sources/NotifyKit"),
-        .testTarget(name: "NotifyKitTests", dependencies: ["NotifyKit"], path: "Tests/NotifyKitTests"),
+        .testTarget(name: "NotifyKitTests", dependencies: ["NotifyKit"], path: "tests/NotifyKitTests"),
     ]
 )
