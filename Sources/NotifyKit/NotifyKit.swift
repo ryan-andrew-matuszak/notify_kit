@@ -45,6 +45,16 @@ public final class NotifyKit: NSObject, ObservableObject {
     /// Called for a notification arriving while the app is in the foreground —
     /// e.g. to refresh an in-app feed. Return the presentation you want.
     public var onForeground: (([String: String]) -> UNNotificationPresentationOptions)?
+    /// Called when the user taps one of a notification's action buttons (not the
+    /// notification itself), with the action id and the payload's string keys.
+    /// Runs in the background for non-foreground actions — iOS waits for it.
+    public var onAction: ((String, [String: String]) async -> Void)?
+
+    /// Register the notification categories (action buttons) this app knows.
+    /// The server picks one per push (`Notification.category` / `aps.category`).
+    public func setCategories(_ categories: Set<UNNotificationCategory>) {
+        UNUserNotificationCenter.current().setNotificationCategories(categories)
+    }
 
     private var config: Config?
 
@@ -126,7 +136,13 @@ extension NotifyKit: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse
     ) async {
         let info = Self.stringKeys(response.notification.request.content.userInfo)
-        await MainActor.run { onOpen?(info) }
+        let action = response.actionIdentifier
+        if action == UNNotificationDefaultActionIdentifier {
+            await MainActor.run { onOpen?(info) }
+        } else if action != UNNotificationDismissActionIdentifier {
+            let handler = await MainActor.run { onAction }
+            await handler?(action, info)
+        }
     }
 
     /// The custom, string-valued payload keys (Sendable, unlike `userInfo`).

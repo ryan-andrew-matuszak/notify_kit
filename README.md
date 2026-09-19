@@ -65,6 +65,17 @@ NotifyKit.shared.onOpen = { info in route(info["deeplink"]) }
 await NotifyKit.shared.requestAuthorizationAndRegister()
 ```
 
+Action buttons: register categories once, then handle taps —
+
+```swift
+NotifyKit.shared.setCategories([UNNotificationCategory(identifier: "timer",
+    actions: [UNNotificationAction(identifier: "SNOOZE_5", title: "Snooze 5 min")],
+    intentIdentifiers: [])])
+NotifyKit.shared.onAction = { action, info in /* call your server */ }
+```
+
+and send with `Notification(..., category="timer")`.
+
 The app target needs the **Push Notifications** capability (and **Time Sensitive
 Notifications** if you use that level).
 
