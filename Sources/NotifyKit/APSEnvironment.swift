@@ -5,14 +5,19 @@ import Foundation
 /// production — so the server must be told, per device.
 ///
 /// Read from the embedded provisioning profile's `aps-environment` entitlement.
-/// App Store / TestFlight builds carry no embedded profile → production.
+/// App Store / TestFlight builds carry no embedded profile → production. The
+/// Simulator has no profile either but only ever gets sandbox tokens.
 public enum APSEnvironment: String {
     case sandbox, production
 
     public static let current: APSEnvironment = {
+        #if targetEnvironment(simulator)
+        return .sandbox
+        #else
         guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
               let data = try? Data(contentsOf: url) else { return .production }
         return parse(profile: data)
+        #endif
     }()
 
     /// The profile is a CMS envelope around a plist; the plist is plain text

@@ -9,7 +9,7 @@ from .payload import LEVELS, Notification, apns_payload
 from .registry import Device, DeviceRegistry, JsonDeviceRegistry
 from .service import Provider, PushService
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = ["ApnsClient", "ApnsConfig", "Device", "DeviceRegistry", "JsonDeviceRegistry",
            "LEVELS", "Notification", "Provider", "PushService", "SendResult",
